@@ -1,941 +1,1854 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Word Reveal Battle</title>
-    <style>
-        :root {
-            --bg-main: #0f172a;
-            --bg-card: #1e293b;
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --accent: #10b981;
-            --accent-danger: #ef4444;
-            --accent-warning: #f59e0b;
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --border: #334155;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Word Reveal Battle</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --void: #08090d;
+    --deep: #0d1017;
+    --card: #111620;
+    --panel: #161c2a;
+    --rim: #1e2740;
+    --line: #252f47;
+    --mute: #3a4560;
 
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    --electric: #4e9eff;
+    --electric-dim: rgba(78,158,255,0.12);
+    --electric-glow: rgba(78,158,255,0.35);
 
-        body {
-            background-color: var(--bg-main);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 20px;
-        }
+    --neon: #3dffa0;
+    --neon-dim: rgba(61,255,160,0.1);
+    --neon-glow: rgba(61,255,160,0.3);
 
-        .container {
-            width: 100%;
-            max-width: 600px;
-            background: var(--bg-card);
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            padding: 30px;
-            border: 1px solid var(--border);
-            margin: auto;
-        }
+    --amber: #ffb930;
+    --amber-dim: rgba(255,185,48,0.1);
+    --amber-glow: rgba(255,185,48,0.3);
 
-        @media (max-width: 480px) { .container { padding: 20px; } }
+    --danger: #ff4757;
+    --danger-dim: rgba(255,71,87,0.1);
+    --danger-glow: rgba(255,71,87,0.3);
 
-        .screen { display: none; animation: fadeIn 0.4s ease-in-out forwards; }
-        .screen.active { display: block; }
+    --purple: #a259ff;
+    --purple-dim: rgba(162,89,255,0.1);
+    --purple-glow: rgba(162,89,255,0.3);
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    --t1: #f0f4ff;
+    --t2: #8b9ab8;
+    --t3: #4a5878;
 
-        h1, h2, h3 { text-align: center; margin-bottom: 20px; font-weight: 700; }
-        h1 { color: var(--primary); font-size: 2.2rem; }
-        h2 { font-size: 1.6rem; color: var(--text-main); }
+    --font-display: 'Rajdhani', sans-serif;
+    --font-body: 'Inter', sans-serif;
 
-        p.description { text-align: center; color: var(--text-muted); margin-bottom: 30px; font-size: 1rem; line-height: 1.5; }
+    --r: 10px;
+    --r-sm: 6px;
+    --r-lg: 16px;
+  }
 
-        .form-group { margin-bottom: 20px; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        label { display: block; margin-bottom: 8px; color: var(--text-muted); font-weight: 600; font-size: 0.9rem; }
+  body {
+    background: var(--void);
+    color: var(--t1);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 16px;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(78,158,255,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(61,255,160,0.04) 0%, transparent 50%);
+  }
 
-        input[type="text"], input[type="number"], select {
-            width: 100%; padding: 12px; background: var(--bg-main);
-            border: 1px solid var(--border); border-radius: 8px;
-            color: var(--text-main); font-size: 1rem; outline: none; transition: border 0.2s;
-        }
-        input:focus, select:focus { border-color: var(--primary); }
+  .wrap {
+    width: 100%;
+    max-width: 620px;
+    padding-top: 12px;
+  }
 
-        .btn {
-            display: block; width: 100%; padding: 14px; background: var(--primary);
-            color: #fff; border: none; border-radius: 8px; font-size: 1rem;
-            font-weight: 700; cursor: pointer; transition: background 0.2s, transform 0.1s;
-            text-align: center; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .btn:hover { background: var(--primary-hover); }
-        .btn:active { transform: scale(0.98); }
-        .btn-secondary { background: var(--border); color: var(--text-main); margin-top: 10px; }
-        .btn-secondary:hover { background: #475569; }
-        .btn-accent { background: var(--accent); }
-        .btn-accent:hover { background: #059669; }
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+  /* ── SCREENS ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
 
-        .player-input-list { max-height: 200px; overflow-y: auto; margin-bottom: 20px; padding-right: 5px; }
-        .player-input-item { margin-bottom: 10px; }
+  .screen-enter {
+    animation: screenIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes screenIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-        .badge-info {
-            background: rgba(99,102,241,0.15); color: var(--primary);
-            padding: 15px; border-radius: 10px; text-align: center;
-            font-size: 1.2rem; font-weight: 600; margin-bottom: 25px; border: 1px dashed var(--primary);
-        }
-        .badge-success {
-            background: rgba(16,185,129,0.15); color: var(--accent);
-            padding: 15px; border-radius: 10px; text-align: center;
-            font-size: 1.1rem; font-weight: 600; margin-bottom: 20px; border: 1px dashed var(--accent);
-        }
-        .badge-warning {
-            background: rgba(245,158,11,0.15); color: var(--accent-warning);
-            padding: 15px; border-radius: 10px; text-align: center;
-            font-size: 1.1rem; font-weight: 600; margin-bottom: 20px; border: 1px dashed var(--accent-warning);
-        }
+  /* ── CARD ── */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--rim);
+    border-radius: var(--r-lg);
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+  .card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--r-lg);
+    pointer-events: none;
+    background: linear-gradient(135deg, rgba(78,158,255,0.04) 0%, transparent 60%);
+  }
 
-        .board-display { display: flex; justify-content: center; gap: 10px; margin: 25px 0; flex-wrap: wrap; }
+  @media (max-width: 480px) { .card { padding: 20px; } }
 
-        .letter-box {
-            width: 45px; height: 45px; border-bottom: 4px solid var(--primary);
-            background: rgba(255,255,255,0.05); display: flex; align-items: center;
-            justify-content: center; font-size: 1.6rem; font-weight: bold;
-            text-transform: uppercase; border-radius: 4px 4px 0 0;
-        }
+  /* ── HEADINGS ── */
+  .title-lg {
+    font-family: var(--font-display);
+    font-size: 2.6rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    line-height: 1;
+    background: linear-gradient(135deg, var(--t1) 30%, var(--electric) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-align: center;
+  }
+  .title-md {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--t1);
+    text-align: center;
+    margin-bottom: 20px;
+  }
 
-        .meta-info {
-            display: flex; justify-content: space-between; background: var(--bg-main);
-            padding: 10px 15px; border-radius: 8px; margin-bottom: 20px;
-            font-size: 0.9rem; border: 1px solid var(--border);
-        }
+  /* ── TAGLINE ── */
+  .tagline {
+    text-align: center;
+    color: var(--t2);
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin-bottom: 28px;
+  }
 
-        .timer-bar-container { width: 100%; height: 6px; background: var(--border); border-radius: 3px; margin-bottom: 25px; overflow: hidden; }
-        .timer-bar { height: 100%; width: 100%; background: var(--accent); transition: width 1s linear, background-color 0.5s; }
+  /* ── LOGO MARK ── */
+  .logo-mark {
+    width: 56px;
+    height: 56px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--electric-dim);
+    border: 1px solid var(--electric-glow);
+    border-radius: var(--r);
+    font-family: var(--font-display);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--electric);
+  }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 0.95rem; }
-        th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
-        th { color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.8rem; }
+  /* ── DIVIDER ── */
+  .divider {
+    height: 1px;
+    background: var(--line);
+    margin: 24px 0;
+  }
 
-        .history-box {
-            max-height: 120px; overflow-y: auto; background: var(--bg-main);
-            border: 1px solid var(--border); border-radius: 8px; padding: 10px;
-            margin-top: 20px; font-size: 0.85rem;
-        }
-        .history-item { padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.03); display: flex; justify-content: space-between; }
-        .history-item:last-child { border: none; }
+  /* ── FORM ── */
+  .form-group { margin-bottom: 18px; }
+  .form-group label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--t3);
+    margin-bottom: 8px;
+  }
+  input[type="text"],
+  input[type="number"],
+  select {
+    width: 100%;
+    padding: 11px 14px;
+    background: var(--deep);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    color: var(--t1);
+    font-size: 0.9375rem;
+    font-family: var(--font-body);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus {
+    border-color: var(--electric);
+    box-shadow: 0 0 0 3px var(--electric-dim);
+  }
+  select option { background: var(--card); }
 
-        .txt-accent { color: var(--accent); font-weight: bold; }
-        .txt-holder { color: #f59e0b; font-weight: bold; }
-        .txt-danger { color: var(--accent-danger); }
+  .player-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 230px;
+    overflow-y: auto;
+    padding-right: 4px;
+    margin-bottom: 18px;
+  }
+  .player-list::-webkit-scrollbar { width: 4px; }
+  .player-list::-webkit-scrollbar-track { background: var(--deep); border-radius: 4px; }
+  .player-list::-webkit-scrollbar-thumb { background: var(--mute); border-radius: 4px; }
 
-        .leaderboard-table tr.winner-row { background: rgba(16,185,129,0.1); color: var(--accent); font-weight: bold; }
+  .player-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .player-num {
+    width: 26px;
+    height: 26px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--t3);
+    flex-shrink: 0;
+  }
+  .player-row input { flex: 1; }
 
-        .winner-card {
-            text-align: center; padding: 30px 20px;
-            background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(16,185,129,0.1));
-            border-radius: 12px; border: 2px solid var(--accent); margin-bottom: 25px;
-        }
-        .trophy { font-size: 4rem; margin-bottom: 15px; animation: bounce 2s infinite; }
-        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+  /* ── DIFFICULTY TOGGLE ── */
+  .diff-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .diff-btn {
+    padding: 12px;
+    background: var(--deep);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    color: var(--t2);
+    font-family: var(--font-body);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    line-height: 1.4;
+  }
+  .diff-btn:hover { border-color: var(--mute); color: var(--t1); }
+  .diff-btn.active.easy {
+    background: var(--neon-dim);
+    border-color: var(--neon);
+    color: var(--neon);
+  }
+  .diff-btn.active.hard {
+    background: var(--danger-dim);
+    border-color: var(--danger);
+    color: var(--danger);
+  }
 
-        .error-msg { color: var(--accent-danger); font-size: 0.85rem; margin-top: 5px; display: none; }
+  /* ── BUTTONS ── */
+  .btn {
+    display: block;
+    width: 100%;
+    padding: 13px 20px;
+    border: none;
+    border-radius: var(--r-sm);
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.18s;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn:active { transform: scale(0.975); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+  .btn + .btn { margin-top: 10px; }
 
-        .difficulty-toggle {
-            display: flex; gap: 10px; margin-bottom: 20px;
-        }
-        .difficulty-btn {
-            flex: 1; padding: 10px; border: 2px solid var(--border);
-            border-radius: 8px; background: transparent; color: var(--text-muted);
-            cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.2s;
-        }
-        .difficulty-btn.active { border-color: var(--primary); color: var(--primary); background: rgba(99,102,241,0.1); }
+  .btn-primary {
+    background: var(--electric);
+    color: #05111f;
+  }
+  .btn-primary:hover:not(:disabled) { background: #69b2ff; box-shadow: 0 0 20px var(--electric-glow); }
 
-        .bonus-solve-section {
-            background: rgba(245,158,11,0.08); border: 1px solid var(--accent-warning);
-            border-radius: 10px; padding: 20px; margin-bottom: 20px;
-        }
-        .bonus-solve-section h3 { color: var(--accent-warning); margin-bottom: 10px; }
+  .btn-success {
+    background: var(--neon);
+    color: #021a0e;
+  }
+  .btn-success:hover:not(:disabled) { background: #5cffc3; box-shadow: 0 0 20px var(--neon-glow); }
 
-        .validation-status {
-            font-size: 0.8rem; margin-top: 4px; min-height: 18px;
-        }
-        .validation-status.checking { color: var(--text-muted); }
-        .validation-status.valid { color: var(--accent); }
-        .validation-status.invalid { color: var(--accent-danger); }
+  .btn-ghost {
+    background: var(--panel);
+    color: var(--t2);
+    border: 1px solid var(--line);
+  }
+  .btn-ghost:hover:not(:disabled) { background: var(--rim); color: var(--t1); border-color: var(--mute); }
 
-        .holder-pts-note {
-            font-size: 0.8rem; color: var(--accent-warning); text-align: center; margin-top: 5px;
-        }
-    </style>
+  .btn-danger {
+    background: var(--danger-dim);
+    color: var(--danger);
+    border: 1px solid var(--danger);
+  }
+  .btn-danger:hover:not(:disabled) { background: var(--danger); color: #fff; }
+
+  /* ── BADGE / CALLOUT ── */
+  .badge {
+    padding: 14px 18px;
+    border-radius: var(--r-sm);
+    margin-bottom: 20px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.4;
+  }
+  .badge-electric {
+    background: var(--electric-dim);
+    border: 1px solid var(--electric-glow);
+    color: var(--electric);
+  }
+  .badge-neon {
+    background: var(--neon-dim);
+    border: 1px solid var(--neon-glow);
+    color: var(--neon);
+  }
+  .badge-amber {
+    background: var(--amber-dim);
+    border: 1px solid var(--amber-glow);
+    color: var(--amber);
+  }
+  .badge-danger {
+    background: var(--danger-dim);
+    border: 1px solid var(--danger-glow);
+    color: var(--danger);
+  }
+  .badge-purple {
+    background: var(--purple-dim);
+    border: 1px solid var(--purple-glow);
+    color: var(--purple);
+  }
+
+  /* ── WORD BOARD ── */
+  .board {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 22px 0;
+  }
+  .letter-tile {
+    width: 46px;
+    height: 52px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--t3);
+    text-transform: uppercase;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+  }
+  .letter-tile.revealed {
+    background: var(--electric-dim);
+    border-color: var(--electric);
+    color: var(--electric);
+    animation: tileReveal 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .letter-tile.blank {
+    border-bottom: 3px solid var(--mute);
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-radius: 0;
+    background: transparent;
+  }
+  @keyframes tileReveal {
+    0% { transform: scale(0.6) rotateY(90deg); opacity: 0; }
+    100% { transform: scale(1) rotateY(0deg); opacity: 1; }
+  }
+
+  /* ── META BAR ── */
+  .meta-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    font-size: 0.8125rem;
+  }
+  .meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .meta-label { color: var(--t3); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; }
+  .meta-value { color: var(--t1); font-weight: 600; }
+  .meta-value.accent { color: var(--electric); }
+
+  /* ── TIMER ── */
+  .timer-wrap {
+    margin-bottom: 18px;
+  }
+  .timer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+    font-size: 0.75rem;
+    color: var(--t3);
+  }
+  .timer-count {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+  }
+  .timer-count.urgent { color: var(--danger); }
+  .timer-count.normal { color: var(--electric); }
+  .timer-bar-bg {
+    height: 5px;
+    background: var(--panel);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .timer-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 1s linear, background-color 0.5s;
+    background: var(--electric);
+  }
+  .timer-bar-fill.urgent { background: var(--danger); box-shadow: 0 0 8px var(--danger-glow); }
+
+  /* ── CURRENT GUESSER CARD ── */
+  .guesser-card {
+    background: var(--panel);
+    border: 1px solid var(--electric-glow);
+    border-radius: var(--r-sm);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .guesser-icon {
+    width: 36px;
+    height: 36px;
+    background: var(--electric-dim);
+    border: 1px solid var(--electric);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--electric);
+    flex-shrink: 0;
+  }
+  .guesser-info { flex: 1; }
+  .guesser-role { font-size: 0.7rem; color: var(--t3); text-transform: uppercase; letter-spacing: 0.5px; }
+  .guesser-name { font-family: var(--font-display); font-size: 1.15rem; font-weight: 600; color: var(--electric); letter-spacing: 0.5px; }
+
+  /* ── VALIDATION STATUS ── */
+  .vstatus {
+    font-size: 0.78rem;
+    margin-top: 5px;
+    min-height: 17px;
+    transition: color 0.2s;
+  }
+  .vstatus.checking { color: var(--t3); }
+  .vstatus.valid { color: var(--neon); }
+  .vstatus.invalid { color: var(--danger); }
+
+  /* ── ERROR ── */
+  .err {
+    font-size: 0.8rem;
+    color: var(--danger);
+    margin-top: 5px;
+    display: none;
+  }
+  .err.show { display: block; }
+
+  /* ── SCOREBOARD ── */
+  .score-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+  }
+  .score-table th {
+    padding: 8px 10px;
+    text-align: left;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--t3);
+    border-bottom: 1px solid var(--line);
+    font-weight: 600;
+  }
+  .score-table td {
+    padding: 9px 10px;
+    border-bottom: 1px solid var(--line);
+    color: var(--t2);
+  }
+  .score-table tr:last-child td { border-bottom: none; }
+  .score-table tr.active-row td { background: var(--electric-dim); color: var(--t1); }
+  .score-table tr.active-row td:first-child { color: var(--electric); font-weight: 600; }
+  .score-table tr.winner-row td { background: var(--neon-dim); color: var(--neon); font-weight: 600; }
+  .score-table .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+  }
+  .pill-holder {
+    background: var(--amber-dim);
+    color: var(--amber);
+    border: 1px solid var(--amber-glow);
+  }
+  .pill-active {
+    background: var(--electric-dim);
+    color: var(--electric);
+    border: 1px solid var(--electric-glow);
+  }
+  .pill-guesser {
+    background: var(--panel);
+    color: var(--t3);
+    border: 1px solid var(--line);
+  }
+
+  /* ── GUESS LOG ── */
+  .log-box {
+    background: var(--deep);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    padding: 10px;
+    max-height: 130px;
+    overflow-y: auto;
+    margin-top: 18px;
+  }
+  .log-box::-webkit-scrollbar { width: 3px; }
+  .log-box::-webkit-scrollbar-thumb { background: var(--mute); border-radius: 3px; }
+  .log-header {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--t3);
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .log-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    font-size: 0.8125rem;
+    gap: 10px;
+  }
+  .log-item:last-child { border-bottom: none; }
+  .log-player { color: var(--t2); font-weight: 500; }
+  .log-meta { color: var(--electric); font-weight: 500; white-space: nowrap; }
+  .log-meta.neon { color: var(--neon); }
+  .log-meta.amber { color: var(--amber); }
+  .log-meta.muted { color: var(--t3); }
+
+  /* ── SECTION SPACER ── */
+  .section-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--t3);
+    font-weight: 600;
+    margin: 18px 0 10px;
+  }
+
+  /* ── ROLE ANNOUNCEMENT ── */
+  .announcement-ring {
+    width: 88px;
+    height: 88px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: var(--amber-dim);
+    border: 2px solid var(--amber-glow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    animation: ringPulse 2s ease-in-out infinite;
+  }
+  @keyframes ringPulse {
+    0%, 100% { box-shadow: 0 0 0 0 var(--amber-glow); }
+    50% { box-shadow: 0 0 0 10px transparent; }
+  }
+  .holder-name-display {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--amber);
+    text-align: center;
+    margin: 10px 0 6px;
+  }
+  .holder-sub {
+    text-align: center;
+    color: var(--t3);
+    font-size: 0.875rem;
+    margin-bottom: 6px;
+  }
+  .holder-tip {
+    text-align: center;
+    font-size: 0.8125rem;
+    color: var(--amber);
+    margin-bottom: 24px;
+  }
+
+  /* ── PASS SCREEN ── */
+  .locked-word-badge {
+    text-align: center;
+    padding: 24px;
+    background: var(--neon-dim);
+    border: 1px solid var(--neon-glow);
+    border-radius: var(--r);
+    margin-bottom: 24px;
+  }
+  .locked-icon { font-size: 2.5rem; margin-bottom: 8px; }
+  .locked-word-badge p { color: var(--t2); font-size: 0.875rem; margin-top: 8px; }
+
+  /* ── BONUS PHASE ── */
+  .bonus-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .bonus-icon {
+    width: 44px;
+    height: 44px;
+    background: var(--amber-dim);
+    border: 1px solid var(--amber-glow);
+    border-radius: var(--r-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+  .bonus-title {
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: var(--amber);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .bonus-sub { font-size: 0.8125rem; color: var(--t3); }
+  .bonus-panel {
+    background: var(--panel);
+    border: 1px solid var(--amber-glow);
+    border-radius: var(--r-sm);
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .bonus-guesser-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .bonus-avatar {
+    width: 32px;
+    height: 32px;
+    background: var(--amber-dim);
+    border: 1px solid var(--amber);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--amber);
+    flex-shrink: 0;
+  }
+  .bonus-guesser-info { flex: 1; }
+  .bonus-guesser-label { font-size: 0.7rem; color: var(--t3); text-transform: uppercase; letter-spacing: 0.5px; }
+  .bonus-guesser-name { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; color: var(--amber); }
+  .bonus-pts-note { font-size: 0.8rem; color: var(--neon); font-weight: 600; }
+
+  /* ── ROUND RESULT ── */
+  .result-word-display {
+    text-align: center;
+    padding: 20px;
+    background: var(--panel);
+    border: 1px solid var(--electric-glow);
+    border-radius: var(--r);
+    margin-bottom: 20px;
+  }
+  .result-word-label { font-size: 0.75rem; color: var(--t3); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
+  .result-word {
+    font-family: var(--font-display);
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: var(--electric);
+    text-transform: uppercase;
+  }
+  .result-reason {
+    font-size: 0.875rem;
+    color: var(--t2);
+    text-align: center;
+    margin-bottom: 18px;
+  }
+
+  /* ── FINAL WINNER ── */
+  .winner-stage {
+    text-align: center;
+    padding: 30px 20px;
+    background: linear-gradient(135deg, var(--neon-dim), var(--electric-dim));
+    border: 1px solid var(--neon-glow);
+    border-radius: var(--r);
+    margin-bottom: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .trophy-float {
+    font-size: 3.5rem;
+    margin-bottom: 12px;
+    display: block;
+    animation: trophyFloat 3s ease-in-out infinite;
+  }
+  @keyframes trophyFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  .winner-label { font-size: 0.75rem; color: var(--t3); text-transform: uppercase; letter-spacing: 0.7px; margin-bottom: 6px; }
+  .winner-name {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--neon);
+    margin-bottom: 4px;
+  }
+  .winner-pts { font-size: 1.1rem; color: var(--t2); font-weight: 500; }
+
+  /* ── STATS GRID ── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .stat-card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--r-sm);
+    padding: 12px;
+  }
+  .stat-icon { font-size: 1.2rem; margin-bottom: 6px; }
+  .stat-label { font-size: 0.7rem; color: var(--t3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .stat-value { font-size: 0.875rem; color: var(--electric); font-weight: 600; }
+
+  @media (max-width: 420px) {
+    .stats-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── LEADERBOARD RANK ── */
+  .rank-num {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--t3);
+  }
+  .rank-num.gold { background: var(--amber-dim); border-color: var(--amber); color: var(--amber); }
+
+  /* ── HINT BAR ── */
+  .hint-bar {
+    font-size: 0.78rem;
+    color: var(--amber);
+    text-align: center;
+    margin-top: 6px;
+  }
+
+  /* ── PROGRESS DOTS ── */
+  .round-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+  .round-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--line);
+    transition: all 0.3s;
+  }
+  .round-dot.done { background: var(--electric); }
+  .round-dot.current { background: var(--neon); box-shadow: 0 0 6px var(--neon-glow); transform: scale(1.3); }
+
+  /* ── LOADING SPINNER ── */
+  .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(78,158,255,0.2);
+    border-top-color: var(--electric);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── PULSE OUTLINE ── */
+  @keyframes pulseOutline {
+    0%, 100% { box-shadow: 0 0 0 0 var(--electric-glow); }
+    50% { box-shadow: 0 0 0 6px transparent; }
+  }
+</style>
 </head>
 <body>
-<div class="container">
+<div class="wrap">
 
-    <!-- WELCOME -->
-    <div id="screen-welcome" class="screen active">
-        <h1>Word Reveal Battle</h1>
-        <p class="description">A thrilling local multiplayer word puzzle game. One holds the secret word, the others race to uncover it letter by letter!</p>
-        <button class="btn" onclick="Game.goToSetup()">Start Game</button>
+  <!-- ── WELCOME ── -->
+  <div id="screen-welcome" class="screen active">
+    <div class="card">
+      <div class="logo-mark">W</div>
+      <div class="title-lg">Word Reveal<br>Battle</div>
+      <div class="tagline" style="margin-top:14px;">
+        One player holds the secret word.<br>
+        Everyone else races to uncover it — letter by letter.
+      </div>
+      <div class="divider"></div>
+      <button class="btn btn-primary" onclick="Game.goToSetup()">Enter the Arena</button>
     </div>
+  </div>
 
-    <!-- SETUP -->
-    <div id="screen-setup" class="screen">
-        <h2>Game Setup</h2>
+  <!-- ── SETUP ── -->
+  <div id="screen-setup" class="screen">
+    <div class="card">
+      <div class="title-md">Game Setup</div>
+
+      <div class="form-group">
+        <label>Number of Players (3–10)</label>
+        <input type="number" id="input-player-count" min="3" max="10" value="4" oninput="Game.renderPlayerInputs()">
+      </div>
+
+      <div class="form-group">
+        <label>Number of Rounds</label>
+        <input type="number" id="input-rounds" min="1" max="20" value="5">
+      </div>
+
+      <div class="form-group">
+        <label>Difficulty Mode</label>
+        <div class="diff-row">
+          <button class="diff-btn easy active" id="diff-easy" onclick="Game.setDifficulty('easy')">🟢 Easy<br><span style="font-weight:400;font-size:0.75rem;">Category shown</span></button>
+          <button class="diff-btn hard" id="diff-hard" onclick="Game.setDifficulty('hard')">🔴 Hard<br><span style="font-weight:400;font-size:0.75rem;">Category hidden</span></button>
+        </div>
+      </div>
+
+      <label style="display:block;font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;color:var(--t3);margin-bottom:8px;">Player Names</label>
+      <div id="player-inputs-container" class="player-list"></div>
+      <div id="setup-error" class="err">All players need unique names.</div>
+
+      <button class="btn btn-primary" onclick="Game.processSetup()">Lock In & Start</button>
+    </div>
+  </div>
+
+  <!-- ── HOLDER ANNOUNCEMENT ── -->
+  <div id="screen-holder-announcement" class="screen">
+    <div class="card">
+      <div class="title-md">Role Assignment</div>
+      <div class="announcement-ring">🎯</div>
+      <div class="holder-name-display" id="announcement-holder-name">...</div>
+      <div class="holder-sub">is the <strong style="color:var(--amber);">Word Holder</strong> this round</div>
+      <div class="holder-tip">🏠 Earn +5 pts for every guess you survive!</div>
+      <div class="divider"></div>
+      <div class="tagline" style="margin-bottom:20px;">Everyone else becomes a Guesser. Pass the device to the Word Holder now.</div>
+      <button class="btn btn-primary" onclick="Game.goToSecretEntry()">I am the Holder →</button>
+    </div>
+  </div>
+
+  <!-- ── SECRET ENTRY ── -->
+  <div id="screen-secret-entry" class="screen">
+    <div class="card">
+      <div class="title-md">Enter Secret Word</div>
+      <div class="badge badge-amber" style="margin-bottom:18px;font-size:0.8125rem;font-weight:500;">Keep your screen hidden from other players!</div>
+
+      <div class="form-group">
+        <label>Category</label>
+        <select id="input-category" onchange="Game.handleCategoryChange()">
+          <option value="Custom">Custom / Write My Own</option>
+          <option value="Fruits">Fruits</option>
+          <option value="Animals">Animals</option>
+          <option value="Countries">Countries</option>
+          <option value="Movies">Movies</option>
+          <option value="Sports">Sports</option>
+          <option value="Food">Food</option>
+          <option value="Nature">Nature</option>
+          <option value="Technology">Technology</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="custom-category-group">
+        <label>Custom Category Name</label>
+        <input type="text" id="input-custom-category" placeholder="e.g. Tech, Mythical Creatures…" maxlength="30">
+      </div>
+
+      <div class="form-group">
+        <label>Secret Word (3–15 alphabetic letters)</label>
+        <input type="text" id="input-secret-word" maxlength="15" autocomplete="off"
+               spellcheck="false" oninput="Game.onSecretWordInput()" placeholder="Type your word…">
+        <div id="secret-word-validation" class="vstatus"></div>
+        <div id="secret-error" class="err"></div>
+      </div>
+
+      <button class="btn btn-primary" id="btn-lock-word" onclick="Game.lockSecretWord()">Lock Word</button>
+    </div>
+  </div>
+
+  <!-- ── PASS DEVICE ── -->
+  <div id="screen-pass-device" class="screen">
+    <div class="card">
+      <div class="title-md">Pass the Device</div>
+      <div class="locked-word-badge">
+        <div class="locked-icon">🔒</div>
+        <div style="font-family:var(--font-display);font-size:1.1rem;font-weight:600;color:var(--neon);letter-spacing:1px;">Word Secured!</div>
+        <p id="pass-instruction">Pass the device back to the first Guesser.</p>
+      </div>
+      <div class="tagline" style="margin-bottom:20px;">Guessers: try to reveal all letters by guessing words. Each matching letter in the correct position earns <strong style="color:var(--electric);">+15 pts</strong>. Guess the full word for <strong style="color:var(--neon);">+20 pts</strong>!</div>
+      <button class="btn btn-success" onclick="Game.startGuessingPhases()">Begin Round →</button>
+    </div>
+  </div>
+
+  <!-- ── GUESSING ── -->
+  <div id="screen-guessing" class="screen">
+    <div class="card">
+      <!-- Round dots progress -->
+      <div id="round-dots-container" class="round-dots"></div>
+
+      <!-- Meta bar -->
+      <div class="meta-bar">
+        <div class="meta-item">
+          <span class="meta-label">Round</span>
+          <span class="meta-value accent" id="meta-round">1 / 5</span>
+        </div>
+        <div class="meta-item" style="text-align:center;">
+          <span class="meta-label">Category</span>
+          <span class="meta-value" id="meta-category">—</span>
+        </div>
+        <div class="meta-item" style="text-align:right;">
+          <span class="meta-label">Guesses</span>
+          <span class="meta-value" id="meta-guess-count">0</span>
+        </div>
+      </div>
+
+      <!-- Timer -->
+      <div class="timer-wrap">
+        <div class="timer-header">
+          <span>Time remaining</span>
+          <span class="timer-count normal" id="timer-count">30s</span>
+        </div>
+        <div class="timer-bar-bg">
+          <div id="guess-timer" class="timer-bar-fill" style="width:100%"></div>
+        </div>
+      </div>
+
+      <!-- Board -->
+      <div id="board-container" class="board"></div>
+
+      <!-- Guesser card -->
+      <div class="guesser-card">
+        <div class="guesser-icon" id="guesser-avatar">?</div>
+        <div class="guesser-info">
+          <div class="guesser-role">Your Turn</div>
+          <div class="guesser-name" id="current-guesser-name">...</div>
+        </div>
+        <div style="font-size:0.8rem;color:var(--t3);">15 pts / letter<br>20 pts full word</div>
+      </div>
+
+      <!-- Input -->
+      <div class="form-group">
+        <input type="text" id="input-guess" placeholder="Guess a word…" autocomplete="off" spellcheck="false">
+        <div id="guess-validation" class="vstatus"></div>
+        <div id="guess-error" class="err"></div>
+      </div>
+      <button class="btn btn-primary" id="btn-submit-guess" onclick="Game.submitGuess()">Submit Guess</button>
+
+      <!-- Live Scores -->
+      <div class="section-label">Live Scores</div>
+      <table class="score-table">
+        <thead><tr><th>Player</th><th>Role</th><th>Score</th></tr></thead>
+        <tbody id="live-scoreboard-body"></tbody>
+      </table>
+
+      <!-- Log -->
+      <div class="log-box">
+        <div class="log-header">Guess Log</div>
+        <div id="guess-history-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── BONUS SOLVE PHASE ── -->
+  <div id="screen-bonus-solve" class="screen">
+    <div class="card">
+      <div class="bonus-header">
+        <div class="bonus-icon">⚡</div>
+        <div>
+          <div class="bonus-title">Bonus Solve Phase</div>
+          <div class="bonus-sub">All letters revealed — one final shot each!</div>
+        </div>
+      </div>
+
+      <div class="badge badge-amber" style="margin-bottom:16px;font-size:0.8125rem;">
+        Solve the full word now for <strong style="color:var(--neon);">+20 pts</strong>!
+      </div>
+
+      <!-- Bonus board -->
+      <div id="bonus-board-container" class="board"></div>
+
+      <div class="bonus-panel">
+        <div class="bonus-guesser-row">
+          <div class="bonus-avatar" id="bonus-avatar">?</div>
+          <div class="bonus-guesser-info">
+            <div class="bonus-guesser-label">Solving now</div>
+            <div class="bonus-guesser-name" id="bonus-current-guesser">...</div>
+          </div>
+          <div class="bonus-pts-note">+20 pts</div>
+        </div>
+
         <div class="form-group">
-            <label for="input-player-count">Number of Players (3 – 10)</label>
-            <input type="number" id="input-player-count" min="3" max="10" value="4" onchange="Game.renderPlayerInputs()">
+          <input type="text" id="input-bonus-guess" placeholder="Type the full word…" autocomplete="off" spellcheck="false">
+          <div id="bonus-validation" class="vstatus"></div>
+          <div id="bonus-error" class="err"></div>
         </div>
-        <div class="form-group">
-            <label for="input-rounds">Number of Rounds</label>
-            <input type="number" id="input-rounds" min="1" max="20" value="5">
-        </div>
-        <div class="form-group">
-            <label>Difficulty Mode</label>
-            <div class="difficulty-toggle">
-                <button class="difficulty-btn active" id="diff-easy" onclick="Game.setDifficulty('easy')">🟢 Easy (Category Shown)</button>
-                <button class="difficulty-btn" id="diff-hard" onclick="Game.setDifficulty('hard')">🔴 Hard (Category Hidden)</button>
-            </div>
-        </div>
-        <label>Player Names</label>
-        <div id="player-inputs-container" class="player-input-list"></div>
-        <div id="setup-error" class="error-msg" style="margin-bottom: 15px;">Please fill in unique names for all players.</div>
-        <button class="btn" onclick="Game.processSetup()">Lock Configuration</button>
-    </div>
+        <button class="btn btn-success" id="btn-bonus-submit" onclick="Game.submitBonusGuess()">Solve It!</button>
+        <button class="btn btn-ghost" id="btn-bonus-skip" onclick="Game.advanceBonusTurn()">Skip My Turn</button>
+      </div>
 
-    <!-- HOLDER ANNOUNCEMENT -->
-    <div id="screen-holder-announcement" class="screen">
-        <h2>Role Assignment</h2>
-        <div class="badge-info">
-            <span id="announcement-holder-name" class="txt-holder">...</span> is the Word Holder!
-        </div>
-        <p class="description">Everyone else will be Guessers. Pass the device to the Word Holder now.</p>
-        <p class="holder-pts-note">💡 As Holder, you earn +5 pts for every full round survived!</p>
-        <button class="btn" onclick="Game.goToSecretEntry()">I am the Holder</button>
+      <div class="log-box">
+        <div class="log-header">Bonus Round Log</div>
+        <div id="bonus-history-list"></div>
+      </div>
     </div>
+  </div>
 
-    <!-- SECRET ENTRY -->
-    <div id="screen-secret-entry" class="screen">
-        <h2>Enter Secret Word</h2>
-        <p class="description">Ensure other players cannot view your screen right now!</p>
-        <div class="form-group">
-            <label for="input-category">Category (Optional)</label>
-            <select id="input-category" onchange="Game.handleCategoryChange()">
-                <option value="Custom">Custom / Write My Own</option>
-                <option value="Fruits">Fruits</option>
-                <option value="Animals">Animals</option>
-                <option value="Countries">Countries</option>
-                <option value="Movies">Movies</option>
-                <option value="Sports">Sports</option>
-            </select>
-        </div>
-        <div class="form-group" id="custom-category-group">
-            <label for="input-custom-category">Custom Category Name</label>
-            <input type="text" id="input-custom-category" placeholder="e.g., Tech, Food">
-        </div>
-        <div class="form-group">
-            <label for="input-secret-word">Secret Word (3–15 alphabetic characters)</label>
-            <input type="text" id="input-secret-word" maxlength="15" autocomplete="off" oninput="Game.onSecretWordInput()">
-            <div id="secret-word-validation" class="validation-status"></div>
-            <div id="secret-error" class="error-msg"></div>
-        </div>
-        <button class="btn" id="btn-lock-word" onclick="Game.lockSecretWord()">Lock Word</button>
-    </div>
+  <!-- ── ROUND RESULT ── -->
+  <div id="screen-round-result" class="screen">
+    <div class="card">
+      <div class="title-md">Round Complete</div>
+      <div class="result-word-display">
+        <div class="result-word-label">The Secret Word Was</div>
+        <div class="result-word" id="result-reveal-word">---</div>
+      </div>
+      <div class="result-reason" id="result-reason"></div>
 
-    <!-- PASS DEVICE -->
-    <div id="screen-pass-device" class="screen">
-        <h2>Pass Device</h2>
-        <div class="badge-info">Secret Word Secured!</div>
-        <p class="description" id="pass-instruction">Pass the device back to the first Guesser.</p>
-        <button class="btn" onclick="Game.startGuessingPhases()">Continue Game</button>
-    </div>
+      <div class="section-label">Points Earned This Round</div>
+      <table class="score-table">
+        <thead><tr><th>Player</th><th>Role</th><th>Earned</th><th>Total</th></tr></thead>
+        <tbody id="round-stat-body"></tbody>
+      </table>
 
-    <!-- GUESSING -->
-    <div id="screen-guessing" class="screen">
-        <div class="meta-info">
-            <span id="meta-round">Round 1 / 5</span>
-            <span id="meta-category">Category: General</span>
-        </div>
-        <div class="timer-bar-container">
-            <div id="guess-timer" class="timer-bar"></div>
-        </div>
-        <div id="board-container" class="board-display"></div>
-        <div style="text-align: center; margin-bottom: 20px;">
-            <p style="font-size: 0.9rem; color: var(--text-muted);">Current Guesser</p>
-            <h3 id="current-guesser-name" style="margin-bottom: 0; color: var(--primary);">...</h3>
-        </div>
-        <div class="form-group">
-            <input type="text" id="input-guess" placeholder="Enter your guess..." autocomplete="off">
-            <div id="guess-validation" class="validation-status"></div>
-            <div id="guess-error" class="error-msg"></div>
-        </div>
-        <button class="btn" onclick="Game.submitGuess()">Submit Guess</button>
-        <h3 style="margin-top: 20px;">Live Scores</h3>
-        <p class="holder-pts-note" style="margin-bottom: 10px;">🏠 Holder earns +5 pts per round survived</p>
-        <table>
-            <thead><tr><th>Player</th><th>Role</th><th>Score</th></tr></thead>
-            <tbody id="live-scoreboard-body"></tbody>
-        </table>
-        <div class="history-box">
-            <div style="font-weight: 600; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px;">Guess Logs</div>
-            <div id="guess-history-list"></div>
-        </div>
+      <div style="margin-top:22px;">
+        <button class="btn btn-primary" id="btn-next-round" onclick="Game.initiateNextRound()">Next Round →</button>
+      </div>
     </div>
+  </div>
 
-    <!-- BONUS SOLVE PHASE -->
-    <div id="screen-bonus-solve" class="screen">
-        <h2>⚡ Bonus Solve Phase!</h2>
-        <div class="badge-warning">All letters have been revealed — one final chance to guess the word!</div>
-        <div id="bonus-board-container" class="board-display"></div>
-        <div class="bonus-solve-section">
-            <h3>🎯 Final Solve Attempt</h3>
-            <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">
-                Current guesser: <strong id="bonus-current-guesser" style="color: var(--primary);">...</strong>
-                <br>Correct answer earns <strong style="color: var(--accent);">+20 pts</strong>!
-            </p>
-            <div class="form-group">
-                <input type="text" id="input-bonus-guess" placeholder="Type the full word..." autocomplete="off">
-                <div id="bonus-error" class="error-msg"></div>
-            </div>
-            <button class="btn btn-accent" onclick="Game.submitBonusGuess()">Submit Final Guess</button>
-            <button class="btn btn-secondary" id="btn-bonus-skip" onclick="Game.advanceBonusTurn()">Skip My Turn</button>
-        </div>
-        <div class="history-box" id="bonus-history-box">
-            <div style="font-weight: 600; font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); margin-bottom: 5px;">Bonus Round Log</div>
-            <div id="bonus-history-list"></div>
-        </div>
-    </div>
+  <!-- ── FINAL RESULTS ── -->
+  <div id="screen-final-results" class="screen">
+    <div class="card">
+      <div class="title-md">Final Standings</div>
 
-    <!-- ROUND RESULT -->
-    <div id="screen-round-result" class="screen">
-        <h2>Round Completed</h2>
-        <div class="badge-info">The word was: <span id="result-reveal-word" style="letter-spacing: 2px;">---</span></div>
-        <p class="description" id="result-reason"></p>
-        <h3>Round Statistics</h3>
-        <table style="margin-bottom: 25px;">
-            <thead><tr><th>Player</th><th>Points Gained This Round</th></tr></thead>
-            <tbody id="round-stat-body"></tbody>
-        </table>
-        <button class="btn" id="btn-next-round" onclick="Game.initiateNextRound()"></button>
-    </div>
+      <div class="winner-stage">
+        <span class="trophy-float">🏆</span>
+        <div class="winner-label">Overall Winner</div>
+        <div class="winner-name" id="grand-winner-name">...</div>
+        <div class="winner-pts" id="grand-winner-score">0 Points</div>
+      </div>
 
-    <!-- FINAL RESULTS -->
-    <div id="screen-final-results" class="screen">
-        <h2>Grand Finale</h2>
-        <div class="winner-card">
-            <div class="trophy">🏆</div>
-            <p style="color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase;">Overall Winner</p>
-            <h1 id="grand-winner-name" style="margin: 5px 0 0 0; color: var(--accent);">...</h1>
-            <h3 id="grand-winner-score" style="margin: 5px 0 0 0; color: var(--text-main);">0 Points</h3>
+      <div class="section-label">Full Leaderboard</div>
+      <table class="score-table">
+        <thead><tr><th>#</th><th>Player</th><th>Total Score</th></tr></thead>
+        <tbody id="final-leaderboard-body"></tbody>
+      </table>
+
+      <div class="section-label" style="margin-top:20px;">Game Highlights</div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">💡</div>
+          <div class="stat-label">Most Letters Uncovered</div>
+          <div class="stat-value" id="stat-most-letters">—</div>
         </div>
-        <h3>Final Leaderboard</h3>
-        <table id="final-leaderboard-table">
-            <thead><tr><th>Rank</th><th>Player</th><th>Total Score</th></tr></thead>
-            <tbody id="final-leaderboard-body"></tbody>
-        </table>
-        <h3 style="margin-top: 25px;">Fun Metrics</h3>
-        <table>
-            <tbody>
-                <tr><td>💡 Most Letters Uncovered</td><td id="stat-most-letters" class="txt-accent">-</td></tr>
-                <tr><td>🎯 Most Perfect Word Guesses</td><td id="stat-most-perfect" class="txt-accent">-</td></tr>
-                <tr><td>🔥 Highest Single Round Score</td><td id="stat-highest-round" class="txt-accent">-</td></tr>
-                <tr><td>🏠 Best Word Holder</td><td id="stat-best-holder" class="txt-accent">-</td></tr>
-            </tbody>
-        </table>
-        <button class="btn btn-secondary" onclick="Game.restartWholeGame()">Play Again</button>
+        <div class="stat-card">
+          <div class="stat-icon">🎯</div>
+          <div class="stat-label">Most Word Solves</div>
+          <div class="stat-value" id="stat-most-perfect">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🔥</div>
+          <div class="stat-label">Best Single Round</div>
+          <div class="stat-value" id="stat-highest-round">—</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🏠</div>
+          <div class="stat-label">Best Word Holder</div>
+          <div class="stat-value" id="stat-best-holder">—</div>
+        </div>
+      </div>
+
+      <div style="margin-top:22px;">
+        <button class="btn btn-ghost" onclick="Game.restartWholeGame()">Play Again</button>
+      </div>
     </div>
+  </div>
 
 </div>
 
 <script>
-const DICTIONARY_API = "https://api.dictionaryapi.dev/api/v2/entries/en/";
+const DICT_API = "https://api.dictionaryapi.dev/api/v2/entries/en/";
 
 async function isValidEnglishWord(word) {
-    try {
-        const res = await fetch(DICTIONARY_API + word.toLowerCase());
-        return res.ok;
-    } catch (e) {
-        // If API fails, allow the word (fail-open so network issues don't break game)
-        return true;
-    }
+  try {
+    const res = await fetch(DICT_API + word.toLowerCase());
+    return res.ok;
+  } catch (e) {
+    return true; // fail-open on network error
+  }
+}
+
+function initials(name) {
+  return name.trim().split(' ').map(p => p[0]).join('').slice(0, 2).toUpperCase() || '?';
 }
 
 const Game = {
-    players: [],
-    totalRounds: 5,
-    currentRound: 0,
-    holderHistory: [],
-    difficulty: 'easy', // 'easy' | 'hard'
-    roundStartPlayerIndex: 0, // tracks who starts guessing each round (rotates)
-
-    // Current Round State
-    wordHolder: "",
-    secretWord: "",
-    category: "",
-    revealedBoard: [],
-    guessersOrder: [],
-    currentGuesserIndex: 0,
-    guessedWords: [], // track repeated guesses
-    roundPointsGained: {},
-    holderRoundsAsHolder: {},
-
-    // Bonus solve state
-    bonusGuessersOrder: [],
-    bonusGuesserIndex: 0,
-    bonusAttempted: [],
-
-    // Global Metrics
-    metricLettersRevealed: {},
-    metricPerfectGuesses: {},
-    metricHighestRoundScore: {},
-    metricHolderPoints: {},
-
-    // Timer
-    timerInterval: null,
-    timeLeft: 30,
-
-    // Validation debounce
-    secretWordDebounce: null,
-
-    init() {
-        this.renderPlayerInputs();
-    },
-
-    switchScreen(screenId) {
-        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
-    },
-
-    goToSetup() {
-        this.switchScreen('screen-setup');
-    },
-
-    setDifficulty(mode) {
-        this.difficulty = mode;
-        document.getElementById('diff-easy').classList.toggle('active', mode === 'easy');
-        document.getElementById('diff-hard').classList.toggle('active', mode === 'hard');
-    },
-
-    renderPlayerInputs() {
-        const container = document.getElementById('player-inputs-container');
-        const count = parseInt(document.getElementById('input-player-count').value) || 3;
-        container.innerHTML = '';
-        const defaultNames = ["Arun","Ravi","Aswin","Karthik","Bala","Divya","Hari","Meera","Nitin","Pooja"];
-        for (let i = 0; i < count; i++) {
-            const div = document.createElement('div');
-            div.className = 'player-input-item';
-            div.innerHTML = `<input type="text" class="player-name-input" data-index="${i}" placeholder="Player ${i+1} Name" value="${defaultNames[i] || 'Player '+(i+1)}">`;
-            container.appendChild(div);
-        }
-    },
-
-    processSetup() {
-        const nameInputs = document.querySelectorAll('.player-name-input');
-        const names = [];
-        let valid = true;
-        nameInputs.forEach(input => {
-            const val = input.value.trim();
-            if (!val) valid = false;
-            names.push(val);
-        });
-        if (new Set(names).size !== names.length) valid = false;
-
-        const setupError = document.getElementById('setup-error');
-        if (!valid) { setupError.style.display = 'block'; return; }
-        setupError.style.display = 'none';
-
-        this.totalRounds = parseInt(document.getElementById('input-rounds').value) || 5;
-        this.players = names;
-        this.scores = {};
-        this.holderHistory = [];
-        this.currentRound = 0;
-        this.roundStartPlayerIndex = 0;
-
-        this.players.forEach(p => {
-            this.scores[p] = 0;
-            this.metricLettersRevealed[p] = 0;
-            this.metricPerfectGuesses[p] = 0;
-            this.metricHighestRoundScore[p] = 0;
-            this.metricHolderPoints[p] = 0;
-            this.holderRoundsAsHolder[p] = 0;
-        });
-
-        this.startNewRoundStructure();
-    },
-
-    startNewRoundStructure() {
-        this.currentRound++;
-        this.roundPointsGained = {};
-        this.guessedWords = [];
-        this.players.forEach(p => this.roundPointsGained[p] = 0);
-
-        // Fair holder rotation: exhaustion strategy
-        let potentialHolders = this.players.filter(p => !this.holderHistory.includes(p));
-        if (potentialHolders.length === 0) {
-            this.holderHistory = [];
-            potentialHolders = this.players;
-        }
-        this.wordHolder = potentialHolders[Math.floor(Math.random() * potentialHolders.length)];
-        this.holderHistory.push(this.wordHolder);
-
-        // Turn order: start from roundStartPlayerIndex, excluding holder
-        const guessers = this.players.filter(p => p !== this.wordHolder);
-        // Rotate starting player (use roundStartPlayerIndex relative to all players, skip holder)
-        const allPlayersStartIdx = this.roundStartPlayerIndex % this.players.length;
-        const allPlayersSorted = [
-            ...this.players.slice(allPlayersStartIdx),
-            ...this.players.slice(0, allPlayersStartIdx)
-        ].filter(p => p !== this.wordHolder);
-        this.guessersOrder = allPlayersSorted.length > 0 ? allPlayersSorted : guessers;
-        this.currentGuesserIndex = 0;
-
-        // Advance start index for next round
-        this.roundStartPlayerIndex = (this.roundStartPlayerIndex + 1) % this.players.length;
-
-        document.getElementById('announcement-holder-name').innerText = this.wordHolder;
-        this.switchScreen('screen-holder-announcement');
-    },
-
-    goToSecretEntry() {
-        document.getElementById('input-secret-word').value = "";
-        document.getElementById('input-custom-category').value = "";
-        document.getElementById('input-category').value = "Custom";
-        document.getElementById('secret-word-validation').textContent = "";
-        document.getElementById('secret-word-validation').className = "validation-status";
-        document.getElementById('secret-error').style.display = 'none';
-        this.handleCategoryChange();
-        this.switchScreen('screen-secret-entry');
-    },
-
-    handleCategoryChange() {
-        const sel = document.getElementById('input-category');
-        document.getElementById('custom-category-group').style.display = sel.value === "Custom" ? "block" : "none";
-    },
-
-    onSecretWordInput() {
-        clearTimeout(this.secretWordDebounce);
-        const word = document.getElementById('input-secret-word').value.trim().toUpperCase();
-        const statusEl = document.getElementById('secret-word-validation');
-
-        if (word.length < 3) {
-            statusEl.textContent = "";
-            statusEl.className = "validation-status";
-            return;
-        }
-
-        if (!/^[A-Z]+$/.test(word)) {
-            statusEl.textContent = "Only letters allowed.";
-            statusEl.className = "validation-status invalid";
-            return;
-        }
-
-        statusEl.textContent = "Checking dictionary…";
-        statusEl.className = "validation-status checking";
-
-        this.secretWordDebounce = setTimeout(async () => {
-            const valid = await isValidEnglishWord(word);
-            if (valid) {
-                statusEl.textContent = "✓ Valid word";
-                statusEl.className = "validation-status valid";
-            } else {
-                statusEl.textContent = "✗ Not a recognized English word";
-                statusEl.className = "validation-status invalid";
-            }
-        }, 600);
-    },
-
-    async lockSecretWord() {
-        const categorySelect = document.getElementById('input-category').value;
-        let finalCategory = categorySelect;
-        if (categorySelect === "Custom") {
-            finalCategory = document.getElementById('input-custom-category').value.trim() || "General";
-        }
-
-        let wordInput = document.getElementById('input-secret-word').value.trim().toUpperCase();
-        const errorElement = document.getElementById('secret-error');
-
-        if (wordInput.length < 3 || wordInput.length > 15 || !/^[A-Z]+$/.test(wordInput)) {
-            errorElement.innerText = "Word must be 3–15 letters, alphabetic only.";
-            errorElement.style.display = 'block';
-            return;
-        }
-
-        // Block word that matches category name (prevent leakage)
-        if (wordInput === finalCategory.toUpperCase()) {
-            errorElement.innerText = "Secret word cannot be the same as the category name!";
-            errorElement.style.display = 'block';
-            return;
-        }
-
-        // Dictionary validation
-        const lockBtn = document.getElementById('btn-lock-word');
-        lockBtn.disabled = true;
-        lockBtn.textContent = "Validating…";
-        const valid = await isValidEnglishWord(wordInput);
-        lockBtn.disabled = false;
-        lockBtn.textContent = "Lock Word";
-
-        if (!valid) {
-            errorElement.innerText = "Not a recognized English word. Please choose a valid word.";
-            errorElement.style.display = 'block';
-            return;
-        }
-
-        errorElement.style.display = 'none';
-        this.secretWord = wordInput;
-        this.category = finalCategory;
-        this.revealedBoard = Array(this.secretWord.length).fill('_');
-
-        document.getElementById('pass-instruction').innerText = `Pass the device back to the first guesser: ${this.guessersOrder[0]}`;
-        this.switchScreen('screen-pass-device');
-    },
-
-    startGuessingPhases() {
-        this.switchScreen('screen-guessing');
-        document.getElementById('guess-history-list').innerHTML = "";
-        document.getElementById('guess-validation').textContent = "";
-        this.holderGuessCount = 0;
-        this.updateLiveGuessingUIDisplay();
-        this.startTurnTimer();
-    },
-
-    updateLiveGuessingUIDisplay() {
-        document.getElementById('meta-round').innerText = `Round ${this.currentRound} / ${this.totalRounds}`;
-        // Show category only in easy mode
-        document.getElementById('meta-category').innerText = this.difficulty === 'easy'
-            ? `Category: ${this.category}` : `Category: 🔒 Hidden`;
-
-        document.getElementById('current-guesser-name').innerText = this.guessersOrder[this.currentGuesserIndex];
-        document.getElementById('input-guess').value = "";
-        document.getElementById('guess-error').style.display = 'none';
-        document.getElementById('guess-validation').textContent = "";
-
-        const boardContainer = document.getElementById('board-container');
-        boardContainer.innerHTML = '';
-        this.revealedBoard.forEach(char => {
-            const box = document.createElement('div');
-            box.className = 'letter-box';
-            box.innerText = char === '_' ? '' : char;
-            boardContainer.appendChild(box);
-        });
-
-        const scoreboardBody = document.getElementById('live-scoreboard-body');
-        scoreboardBody.innerHTML = '';
-        this.players.forEach(player => {
-            let roleStr = "Guesser";
-            let rowStyle = "";
-            if (player === this.wordHolder) {
-                roleStr = `<span class="txt-holder">Holder</span>`;
-            } else if (player === this.guessersOrder[this.currentGuesserIndex]) {
-                rowStyle = `style="background: rgba(99,102,241,0.08);"`;
-            }
-            scoreboardBody.innerHTML += `
-                <tr ${rowStyle}>
-                    <td>${player} ${player === this.guessersOrder[this.currentGuesserIndex] ? '➡️' : ''}</td>
-                    <td>${roleStr}</td>
-                    <td>${this.scores[player]} pts</td>
-                </tr>`;
-        });
-    },
-
-    startTurnTimer() {
-        clearInterval(this.timerInterval);
-        this.timeLeft = 30;
-        const bar = document.getElementById('guess-timer');
-        bar.style.width = '100%';
-        bar.style.backgroundColor = 'var(--accent)';
-
-        this.timerInterval = setInterval(() => {
-            this.timeLeft--;
-            bar.style.width = `${(this.timeLeft / 30) * 100}%`;
-            if (this.timeLeft <= 10) bar.style.backgroundColor = 'var(--accent-danger)';
-            if (this.timeLeft <= 0) {
-                clearInterval(this.timerInterval);
-                this.handleTurnTimeout();
-            }
-        }, 1000);
-    },
-
-    handleTurnTimeout() {
-        const guesser = this.guessersOrder[this.currentGuesserIndex];
-        this.logGuessAction(guesser, "[TIMEOUT]", "⏰ Time expired");
-        this.holderGuessCount++;
-        this.advanceTurnSequence();
-    },
-
-    async submitGuess() {
-        const guessInput = document.getElementById('input-guess').value.trim().toUpperCase();
-        const errorElement = document.getElementById('guess-error');
-        const validationEl = document.getElementById('guess-validation');
-        const activeGuesser = this.guessersOrder[this.currentGuesserIndex];
-
-        if (guessInput.length !== this.secretWord.length) {
-            errorElement.innerText = `Word must be exactly ${this.secretWord.length} letters.`;
-            errorElement.style.display = 'block';
-            return;
-        }
-
-        if (!/^[A-Z]+$/.test(guessInput)) {
-            errorElement.innerText = "Only alphabetic letters allowed.";
-            errorElement.style.display = 'block';
-            return;
-        }
-
-        // Repeated guess check
-        if (this.guessedWords.includes(guessInput)) {
-            errorElement.innerText = `"${guessInput}" was already guessed! Try a different word.`;
-            errorElement.style.display = 'block';
-            return;
-        }
-
-        // Dictionary validation
-        errorElement.style.display = 'none';
-        validationEl.textContent = "Checking…";
-        validationEl.className = "validation-status checking";
-
-        const valid = await isValidEnglishWord(guessInput);
-        if (!valid) {
-            validationEl.textContent = "✗ Not a valid English word.";
-            validationEl.className = "validation-status invalid";
-            return;
-        }
-        validationEl.textContent = "";
-        validationEl.className = "validation-status";
-
-        clearInterval(this.timerInterval);
-        this.guessedWords.push(guessInput);
-
-        if (guessInput === this.secretWord) {
-            const points = 20;
-            this.scores[activeGuesser] += points;
-            this.roundPointsGained[activeGuesser] += points;
-            this.metricPerfectGuesses[activeGuesser]++;
-            for (let i = 0; i < this.secretWord.length; i++) this.revealedBoard[i] = this.secretWord[i];
-            this.logGuessAction(activeGuesser, guessInput, `🎉 Correct! (+20)`);
-            // Holder gets points for all previous rounds survived
-            this.awardHolderSurvivorPoints();
-            this.terminateRoundSequence(`Guessed correctly by ${activeGuesser}!`);
-            return;
-        }
-
-        // Letter matching
-        let newLetters = 0;
-        let pts = 0;
-        for (let i = 0; i < this.secretWord.length; i++) {
-            if (guessInput[i] === this.secretWord[i] && this.revealedBoard[i] === '_') {
-                this.revealedBoard[i] = this.secretWord[i];
-                pts += 15;
-                newLetters++;
-            }
-        }
-
-        if (newLetters > 0) {
-            this.scores[activeGuesser] += pts;
-            this.roundPointsGained[activeGuesser] += pts;
-            this.metricLettersRevealed[activeGuesser] += newLetters;
-            this.logGuessAction(activeGuesser, guessInput, `✨ +${newLetters} letters! (+${pts})`);
-        } else {
-            this.logGuessAction(activeGuesser, guessInput, `❌ No new matches`);
-        }
-
-        this.holderGuessCount++;
-
-        // If all letters revealed → Bonus Solve Phase
-        if (!this.revealedBoard.includes('_')) {
-            this.awardHolderSurvivorPoints();
-            this.startBonusSolvePhase();
-            return;
-        }
-
-        this.advanceTurnSequence();
-    },
-
-    advanceTurnSequence() {
-        this.currentGuesserIndex = (this.currentGuesserIndex + 1) % this.guessersOrder.length;
-        this.updateLiveGuessingUIDisplay();
-        this.startTurnTimer();
-    },
-
-    awardHolderSurvivorPoints() {
-        // Holder earns +5 per complete round (full cycle of all guessers) survived
-        const roundsCompleted = this.holderGuessCount; // each guess = 1 turn survived
-        const holderPts = roundsCompleted * 5;
-        if (holderPts > 0) {
-            this.scores[this.wordHolder] += holderPts;
-            this.roundPointsGained[this.wordHolder] += holderPts;
-            this.metricHolderPoints[this.wordHolder] = (this.metricHolderPoints[this.wordHolder] || 0) + holderPts;
-            this.logGuessAction(this.wordHolder, "[HOLDER BONUS]", `🏠 Survived ${roundsCompleted} guesses! (+${holderPts})`);
-        }
-    },
-
-    // ── BONUS SOLVE PHASE ──────────────────────────────────────
-    startBonusSolvePhase() {
-        clearInterval(this.timerInterval);
-        this.bonusGuessersOrder = [...this.guessersOrder];
-        this.bonusGuesserIndex = 0;
-        this.bonusAttempted = [];
-        document.getElementById('bonus-history-list').innerHTML = '';
-        this.updateBonusUI();
-        this.switchScreen('screen-bonus-solve');
-
-        // Show board
-        const bonusBoard = document.getElementById('bonus-board-container');
-        bonusBoard.innerHTML = '';
-        this.revealedBoard.forEach(char => {
-            const box = document.createElement('div');
-            box.className = 'letter-box';
-            box.innerText = char;
-            bonusBoard.appendChild(box);
-        });
-    },
-
-    updateBonusUI() {
-        const guesser = this.bonusGuessersOrder[this.bonusGuesserIndex];
-        document.getElementById('bonus-current-guesser').innerText = guesser;
-        document.getElementById('input-bonus-guess').value = '';
-        document.getElementById('bonus-error').style.display = 'none';
-
-        const skipBtn = document.getElementById('btn-bonus-skip');
-        skipBtn.disabled = false;
-    },
-
-    submitBonusGuess() {
-        const input = document.getElementById('input-bonus-guess').value.trim().toUpperCase();
-        const errorEl = document.getElementById('bonus-error');
-        const guesser = this.bonusGuessersOrder[this.bonusGuesserIndex];
-
-        if (!input) {
-            errorEl.innerText = "Please enter a word.";
-            errorEl.style.display = 'block';
-            return;
-        }
-
-        this.bonusAttempted.push(guesser);
-
-        if (input === this.secretWord) {
-            this.scores[guesser] += 20;
-            this.roundPointsGained[guesser] += 20;
-            this.metricPerfectGuesses[guesser]++;
-            this.logBonusAction(guesser, input, `🎉 Correct! (+20)`);
-            this.terminateRoundSequence(`${guesser} solved it in the Bonus Phase!`);
-        } else {
-            this.logBonusAction(guesser, input, `❌ Wrong`);
-            this.advanceBonusTurn();
-        }
-    },
-
-    advanceBonusTurn() {
-        const guesser = this.bonusGuessersOrder[this.bonusGuesserIndex];
-        if (!this.bonusAttempted.includes(guesser)) {
-            this.logBonusAction(guesser, "[SKIPPED]", "⏩ Skipped");
-            this.bonusAttempted.push(guesser);
-        }
-
-        this.bonusGuesserIndex++;
-        if (this.bonusGuesserIndex >= this.bonusGuessersOrder.length) {
-            // All had a chance — nobody got it
-            this.terminateRoundSequence("Nobody solved the word in the Bonus Phase!");
-            return;
-        }
-        this.updateBonusUI();
-    },
-
-    logBonusAction(player, word, meta) {
-        const list = document.getElementById('bonus-history-list');
-        const item = document.createElement('div');
-        item.className = 'history-item';
-        item.innerHTML = `<span><strong>${player}</strong>: ${word}</span><span class="txt-accent">${meta}</span>`;
-        list.prepend(item);
-    },
-
-    logGuessAction(player, word, metadata) {
-        const historyList = document.getElementById('guess-history-list');
-        const item = document.createElement('div');
-        item.className = 'history-item';
-        item.innerHTML = `<span><strong>${player}</strong>: ${word}</span><span class="txt-accent">${metadata}</span>`;
-        historyList.prepend(item);
-    },
-
-    terminateRoundSequence(reason) {
-        clearInterval(this.timerInterval);
-
-        this.players.forEach(p => {
-            if (this.roundPointsGained[p] > this.metricHighestRoundScore[p]) {
-                this.metricHighestRoundScore[p] = this.roundPointsGained[p];
-            }
-        });
-
-        document.getElementById('result-reveal-word').innerText = this.secretWord;
-        document.getElementById('result-reason').innerText = reason;
-
-        const roundBody = document.getElementById('round-stat-body');
-        roundBody.innerHTML = '';
-        this.players.forEach(p => {
-            roundBody.innerHTML += `
-                <tr>
-                    <td>${p} ${p === this.wordHolder ? '<span class="txt-holder">(Holder)</span>' : ''}</td>
-                    <td>+${this.roundPointsGained[p]} pts</td>
-                </tr>`;
-        });
-
-        document.getElementById('btn-next-round').innerText = this.currentRound >= this.totalRounds
-            ? "View Final Standings" : "Proceed to Next Round";
-
-        this.switchScreen('screen-round-result');
-    },
-
-    initiateNextRound() {
-        if (this.currentRound >= this.totalRounds) {
-            this.compileFinalStandings();
-        } else {
-            this.startNewRoundStructure();
-        }
-    },
-
-    compileFinalStandings() {
-        this.switchScreen('screen-final-results');
-
-        const sorted = [...this.players].sort((a, b) => this.scores[b] - this.scores[a]);
-        const winner = sorted[0];
-        document.getElementById('grand-winner-name').innerText = winner;
-        document.getElementById('grand-winner-score').innerText = `${this.scores[winner]} Points`;
-
-        const finalBody = document.getElementById('final-leaderboard-body');
-        finalBody.innerHTML = '';
-        sorted.forEach((player, i) => {
-            const rank = i + 1;
-            finalBody.innerHTML += `
-                <tr ${rank === 1 ? 'class="winner-row"' : ''}>
-                    <td>${rank}</td><td>${player}</td><td>${this.scores[player]} pts</td>
-                </tr>`;
-        });
-
-        const best = obj => {
-            let top = "-", val = -1;
-            for (const [p, v] of Object.entries(obj)) { if (v > val) { val = v; top = p; } }
-            return { name: top, val };
-        };
-
-        const bl = best(this.metricLettersRevealed);
-        const bp = best(this.metricPerfectGuesses);
-        const br = best(this.metricHighestRoundScore);
-        const bh = best(this.metricHolderPoints);
-
-        document.getElementById('stat-most-letters').innerText = `${bl.name} (${bl.val} letters)`;
-        document.getElementById('stat-most-perfect').innerText = `${bp.name} (${bp.val} words)`;
-        document.getElementById('stat-highest-round').innerText = `${br.name} (${br.val} pts)`;
-        document.getElementById('stat-best-holder').innerText = `${bh.name} (${bh.val} pts earned)`;
-    },
-
-    restartWholeGame() {
-        this.switchScreen('screen-welcome');
+  // ── Config ──
+  players: [],
+  totalRounds: 5,
+  currentRound: 0,
+  difficulty: 'easy',
+  holderHistory: [],
+  roundStartPlayerIndex: 0,
+
+  // ── Per-round state ──
+  wordHolder: '',
+  secretWord: '',
+  category: '',
+  revealedBoard: [],
+  guessersOrder: [],
+  currentGuesserIndex: 0,
+  guessedWords: [],
+  roundPointsGained: {},
+  holderGuessCount: 0, // incremented per valid guess attempt (timeout or word submitted)
+  scores: {},
+
+  // ── Bonus solve ──
+  bonusGuessersOrder: [],
+  bonusGuesserIndex: 0,
+  bonusAttempted: [],
+
+  // ── Metrics ──
+  metricLettersRevealed: {},
+  metricPerfectGuesses: {},
+  metricHighestRoundScore: {},
+  metricHolderPoints: {},
+
+  // ── Timer ──
+  timerInterval: null,
+  timeLeft: 30,
+  timerRunning: false,
+
+  // ── Validation locks ──
+  secretWordDebounce: null,
+  isValidatingGuess: false,
+  isValidatingBonus: false,
+  isLockingWord: false,
+
+  // ── UI ──
+  switchScreen(id) {
+    const current = document.querySelector('.screen.active');
+    if (current) current.classList.remove('active');
+    const next = document.getElementById(id);
+    next.classList.add('active', 'screen-enter');
+    // remove animation class after it plays so re-entry works
+    next.addEventListener('animationend', () => next.classList.remove('screen-enter'), { once: true });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  },
+
+  showErr(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.classList.add('show');
+  },
+  hideErr(id) {
+    const el = document.getElementById(id);
+    el.classList.remove('show');
+  },
+
+  // ── Init / Setup ──
+  init() { this.renderPlayerInputs(); },
+
+  goToSetup() { this.switchScreen('screen-setup'); },
+
+  setDifficulty(mode) {
+    this.difficulty = mode;
+    document.getElementById('diff-easy').classList.toggle('active', mode === 'easy');
+    document.getElementById('diff-hard').classList.toggle('active', mode === 'hard');
+  },
+
+  renderPlayerInputs() {
+    const count = Math.min(10, Math.max(3, parseInt(document.getElementById('input-player-count').value) || 3));
+    const container = document.getElementById('player-inputs-container');
+    const defaults = ['Arun','Ravi','Aswin','Karthik','Bala','Divya','Hari','Meera','Nitin','Pooja'];
+    // preserve existing values when re-rendering
+    const existing = [...container.querySelectorAll('.pname-input')].map(i => i.value);
+    container.innerHTML = '';
+    for (let i = 0; i < count; i++) {
+      const div = document.createElement('div');
+      div.className = 'player-row';
+      const val = existing[i] !== undefined ? existing[i] : (defaults[i] || `Player ${i+1}`);
+      div.innerHTML = `
+        <div class="player-num">${i+1}</div>
+        <input type="text" class="pname-input" data-index="${i}" placeholder="Player ${i+1} name" value="${val}">
+      `;
+      container.appendChild(div);
     }
+  },
+
+  processSetup() {
+    const inputs = document.querySelectorAll('.pname-input');
+    const names = [...inputs].map(i => i.value.trim());
+    const valid = names.every(n => n.length > 0) && new Set(names).size === names.length;
+    if (!valid) { this.showErr('setup-error', 'All players need unique, non-empty names.'); return; }
+    this.hideErr('setup-error');
+
+    const rounds = parseInt(document.getElementById('input-rounds').value) || 5;
+    this.totalRounds = Math.min(20, Math.max(1, rounds));
+    this.players = names;
+    this.scores = {};
+    this.holderHistory = [];
+    this.currentRound = 0;
+    this.roundStartPlayerIndex = 0;
+    this.players.forEach(p => {
+      this.scores[p] = 0;
+      this.metricLettersRevealed[p] = 0;
+      this.metricPerfectGuesses[p] = 0;
+      this.metricHighestRoundScore[p] = 0;
+      this.metricHolderPoints[p] = 0;
+    });
+    this.startNewRoundStructure();
+  },
+
+  // ── Round Structure ──
+  startNewRoundStructure() {
+    this.currentRound++;
+    this.roundPointsGained = {};
+    this.guessedWords = [];
+    this.holderGuessCount = 0;
+    this.players.forEach(p => this.roundPointsGained[p] = 0);
+
+    // Fair holder rotation (exhaustion strategy)
+    let pool = this.players.filter(p => !this.holderHistory.includes(p));
+    if (!pool.length) { this.holderHistory = []; pool = [...this.players]; }
+    this.wordHolder = pool[Math.floor(Math.random() * pool.length)];
+    this.holderHistory.push(this.wordHolder);
+
+    // Rotate guesser order
+    const startIdx = this.roundStartPlayerIndex % this.players.length;
+    this.guessersOrder = [
+      ...this.players.slice(startIdx),
+      ...this.players.slice(0, startIdx)
+    ].filter(p => p !== this.wordHolder);
+    this.currentGuesserIndex = 0;
+    this.roundStartPlayerIndex = (this.roundStartPlayerIndex + 1) % this.players.length;
+
+    document.getElementById('announcement-holder-name').textContent = this.wordHolder;
+    this.renderRoundDots();
+    this.switchScreen('screen-holder-announcement');
+  },
+
+  renderRoundDots() {
+    const c = document.getElementById('round-dots-container');
+    c.innerHTML = '';
+    for (let i = 1; i <= this.totalRounds; i++) {
+      const d = document.createElement('div');
+      d.className = 'round-dot' + (i < this.currentRound ? ' done' : i === this.currentRound ? ' current' : '');
+      c.appendChild(d);
+    }
+  },
+
+  // ── Secret Entry ──
+  goToSecretEntry() {
+    document.getElementById('input-secret-word').value = '';
+    document.getElementById('input-custom-category').value = '';
+    document.getElementById('input-category').value = 'Custom';
+    document.getElementById('secret-word-validation').textContent = '';
+    document.getElementById('secret-word-validation').className = 'vstatus';
+    this.hideErr('secret-error');
+    this.isLockingWord = false;
+    document.getElementById('btn-lock-word').disabled = false;
+    document.getElementById('btn-lock-word').textContent = 'Lock Word';
+    this.handleCategoryChange();
+    this.switchScreen('screen-secret-entry');
+  },
+
+  handleCategoryChange() {
+    const sel = document.getElementById('input-category').value;
+    document.getElementById('custom-category-group').style.display = sel === 'Custom' ? 'block' : 'none';
+  },
+
+  onSecretWordInput() {
+    if (this.isLockingWord) return;
+    clearTimeout(this.secretWordDebounce);
+    const word = document.getElementById('input-secret-word').value.trim().toUpperCase();
+    const st = document.getElementById('secret-word-validation');
+
+    if (word.length < 3) { st.textContent = ''; st.className = 'vstatus'; return; }
+    if (!/^[A-Z]+$/.test(word)) {
+      st.textContent = 'Only letters allowed.';
+      st.className = 'vstatus invalid';
+      return;
+    }
+
+    st.innerHTML = '<span class="spinner"></span>Checking dictionary…';
+    st.className = 'vstatus checking';
+
+    this.secretWordDebounce = setTimeout(async () => {
+      if (this.isLockingWord) return;
+      const ok = await isValidEnglishWord(word);
+      if (this.isLockingWord) return;
+      st.textContent = ok ? '✓ Valid English word' : '✗ Not a recognised English word';
+      st.className = ok ? 'vstatus valid' : 'vstatus invalid';
+    }, 600);
+  },
+
+  async lockSecretWord() {
+    if (this.isLockingWord) return;
+    clearTimeout(this.secretWordDebounce);
+
+    const catSel = document.getElementById('input-category').value;
+    let category = catSel === 'Custom'
+      ? (document.getElementById('input-custom-category').value.trim() || 'General')
+      : catSel;
+
+    const word = document.getElementById('input-secret-word').value.trim().toUpperCase();
+    this.hideErr('secret-error');
+
+    if (word.length < 3 || word.length > 15 || !/^[A-Z]+$/.test(word)) {
+      this.showErr('secret-error', 'Word must be 3–15 alphabetic letters only.');
+      return;
+    }
+    if (word === category.toUpperCase()) {
+      this.showErr('secret-error', 'Word cannot match the category name.');
+      return;
+    }
+
+    this.isLockingWord = true;
+    const btn = document.getElementById('btn-lock-word');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Validating…';
+
+    const valid = await isValidEnglishWord(word);
+    this.isLockingWord = false;
+    btn.disabled = false;
+    btn.textContent = 'Lock Word';
+
+    if (!valid) {
+      this.showErr('secret-error', 'Not a recognised English word. Pick a different word.');
+      return;
+    }
+
+    this.secretWord = word;
+    this.category = category;
+    this.revealedBoard = Array(word.length).fill('_');
+
+    document.getElementById('pass-instruction').textContent =
+      `Pass the device to the first guesser: ${this.guessersOrder[0]}`;
+    this.switchScreen('screen-pass-device');
+  },
+
+  // ── Guessing Phase ──
+  startGuessingPhases() {
+    document.getElementById('guess-history-list').innerHTML = '';
+    document.getElementById('guess-validation').textContent = '';
+    document.getElementById('guess-validation').className = 'vstatus';
+    document.getElementById('meta-guess-count').textContent = '0';
+    this.isValidatingGuess = false;
+    this.updateLiveGuessingUI();
+    this.startTurnTimer();
+    this.switchScreen('screen-guessing');
+  },
+
+  updateLiveGuessingUI() {
+    // Meta bar
+    document.getElementById('meta-round').textContent = `${this.currentRound} / ${this.totalRounds}`;
+    document.getElementById('meta-category').textContent =
+      this.difficulty === 'easy' ? this.category : '🔒 Hidden';
+
+    // Guesser
+    const guesser = this.guessersOrder[this.currentGuesserIndex];
+    document.getElementById('current-guesser-name').textContent = guesser;
+    document.getElementById('guesser-avatar').textContent = initials(guesser);
+    document.getElementById('input-guess').value = '';
+    this.hideErr('guess-error');
+    document.getElementById('guess-validation').textContent = '';
+    document.getElementById('guess-validation').className = 'vstatus';
+    document.getElementById('btn-submit-guess').disabled = false;
+    this.isValidatingGuess = false;
+
+    // Board
+    this.renderBoard('board-container');
+
+    // Scoreboard
+    const tbody = document.getElementById('live-scoreboard-body');
+    tbody.innerHTML = '';
+    this.players.forEach(p => {
+      const isHolder = p === this.wordHolder;
+      const isActive = p === guesser;
+      const tr = document.createElement('tr');
+      if (isActive) tr.className = 'active-row';
+      tr.innerHTML = `
+        <td>${p} ${isActive ? '▶' : ''}</td>
+        <td>${isHolder ? '<span class="pill pill-holder">Holder</span>' : isActive ? '<span class="pill pill-active">Guessing</span>' : '<span class="pill pill-guesser">Guesser</span>'}</td>
+        <td style="color:var(--neon);font-weight:600;">${this.scores[p]}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  },
+
+  renderBoard(containerId) {
+    const c = document.getElementById(containerId);
+    c.innerHTML = '';
+    this.revealedBoard.forEach((ch, i) => {
+      const tile = document.createElement('div');
+      const revealed = ch !== '_';
+      tile.className = 'letter-tile' + (revealed ? ' revealed' : ' blank');
+      tile.textContent = revealed ? ch : '';
+      if (revealed) tile.style.animationDelay = `${i * 0.04}s`;
+      c.appendChild(tile);
+    });
+  },
+
+  startTurnTimer() {
+    clearInterval(this.timerInterval);
+    this.timeLeft = 30;
+    this.timerRunning = true;
+    const bar = document.getElementById('guess-timer');
+    const countEl = document.getElementById('timer-count');
+    bar.style.width = '100%';
+    bar.className = 'timer-bar-fill';
+    countEl.textContent = '30s';
+    countEl.className = 'timer-count normal';
+
+    this.timerInterval = setInterval(() => {
+      this.timeLeft--;
+      const pct = (this.timeLeft / 30) * 100;
+      bar.style.width = pct + '%';
+      countEl.textContent = this.timeLeft + 's';
+      if (this.timeLeft <= 10) {
+        bar.className = 'timer-bar-fill urgent';
+        countEl.className = 'timer-count urgent';
+      }
+      if (this.timeLeft <= 0) {
+        clearInterval(this.timerInterval);
+        this.timerRunning = false;
+        this.handleTurnTimeout();
+      }
+    }, 1000);
+  },
+
+  stopTimer() {
+    clearInterval(this.timerInterval);
+    this.timerRunning = false;
+  },
+
+  handleTurnTimeout() {
+    if (this.isValidatingGuess) return; // already processing
+    const guesser = this.guessersOrder[this.currentGuesserIndex];
+    this.logGuess(guesser, '[TIMEOUT]', '⏰ Time expired', 'muted');
+    this.holderGuessCount++;
+    this.updateGuessCount();
+    this.advanceTurn();
+  },
+
+  updateGuessCount() {
+    document.getElementById('meta-guess-count').textContent = this.holderGuessCount;
+  },
+
+  async submitGuess() {
+    if (this.isValidatingGuess) return;
+    const input = document.getElementById('input-guess').value.trim().toUpperCase();
+    const validEl = document.getElementById('guess-validation');
+
+    if (!input) { this.showErr('guess-error', 'Enter a word first.'); return; }
+    if (input.length !== this.secretWord.length) {
+      this.showErr('guess-error', `Word must be exactly ${this.secretWord.length} letters.`);
+      return;
+    }
+    if (!/^[A-Z]+$/.test(input)) {
+      this.showErr('guess-error', 'Only alphabetic letters allowed.');
+      return;
+    }
+    if (this.guessedWords.includes(input)) {
+      this.showErr('guess-error', `"${input}" was already guessed this round.`);
+      return;
+    }
+
+    this.hideErr('guess-error');
+    this.isValidatingGuess = true;
+    this.stopTimer(); // pause timer during validation
+    document.getElementById('btn-submit-guess').disabled = true;
+    validEl.innerHTML = '<span class="spinner"></span>Checking…';
+    validEl.className = 'vstatus checking';
+
+    const valid = await isValidEnglishWord(input);
+    this.isValidatingGuess = false;
+
+    if (!valid) {
+      validEl.textContent = '✗ Not a valid English word.';
+      validEl.className = 'vstatus invalid';
+      document.getElementById('btn-submit-guess').disabled = false;
+      // Resume timer (remaining time)
+      this.resumeTimer();
+      return;
+    }
+
+    validEl.textContent = '';
+    validEl.className = 'vstatus';
+    document.getElementById('btn-submit-guess').disabled = false;
+
+    this.guessedWords.push(input);
+    const guesser = this.guessersOrder[this.currentGuesserIndex];
+
+    if (input === this.secretWord) {
+      // Full word correct
+      this.scores[guesser] += 20;
+      this.roundPointsGained[guesser] += 20;
+      this.metricPerfectGuesses[guesser]++;
+      this.revealedBoard = this.secretWord.split('');
+      this.logGuess(guesser, input, '🎉 Correct! (+20)', 'neon');
+      this.awardHolderSurvivorPoints();
+      this.terminateRound(`${guesser} guessed the word!`);
+      return;
+    }
+
+    // Partial letter match (position-correct only)
+    let newLetters = 0;
+    let pts = 0;
+    for (let i = 0; i < this.secretWord.length; i++) {
+      if (input[i] === this.secretWord[i] && this.revealedBoard[i] === '_') {
+        this.revealedBoard[i] = this.secretWord[i];
+        newLetters++;
+        pts += 15;
+      }
+    }
+
+    this.holderGuessCount++;
+    this.updateGuessCount();
+
+    if (newLetters > 0) {
+      this.scores[guesser] += pts;
+      this.roundPointsGained[guesser] += pts;
+      this.metricLettersRevealed[guesser] += newLetters;
+      this.logGuess(guesser, input, `✨ +${newLetters} letter${newLetters>1?'s':''} (+${pts} pts)`, 'electric');
+    } else {
+      this.logGuess(guesser, input, '❌ No position matches', 'muted');
+    }
+
+    // All revealed → bonus phase
+    if (!this.revealedBoard.includes('_')) {
+      this.awardHolderSurvivorPoints();
+      this.startBonusSolvePhase();
+      return;
+    }
+
+    this.advanceTurn();
+  },
+
+  resumeTimer() {
+    // Resume countdown from remaining timeLeft
+    const bar = document.getElementById('guess-timer');
+    const countEl = document.getElementById('timer-count');
+    this.timerRunning = true;
+    this.timerInterval = setInterval(() => {
+      this.timeLeft--;
+      const pct = (this.timeLeft / 30) * 100;
+      bar.style.width = pct + '%';
+      countEl.textContent = this.timeLeft + 's';
+      if (this.timeLeft <= 10) {
+        bar.className = 'timer-bar-fill urgent';
+        countEl.className = 'timer-count urgent';
+      }
+      if (this.timeLeft <= 0) {
+        clearInterval(this.timerInterval);
+        this.timerRunning = false;
+        this.handleTurnTimeout();
+      }
+    }, 1000);
+  },
+
+  advanceTurn() {
+    this.currentGuesserIndex = (this.currentGuesserIndex + 1) % this.guessersOrder.length;
+    this.updateLiveGuessingUI();
+    this.startTurnTimer();
+  },
+
+  awardHolderSurvivorPoints() {
+    // +5 per valid guess attempt the holder survived
+    if (this.holderGuessCount <= 0) return;
+    const pts = this.holderGuessCount * 5;
+    this.scores[this.wordHolder] += pts;
+    this.roundPointsGained[this.wordHolder] += pts;
+    this.metricHolderPoints[this.wordHolder] = (this.metricHolderPoints[this.wordHolder] || 0) + pts;
+    this.logGuess(this.wordHolder, '[Holder Bonus]',
+      `🏠 Survived ${this.holderGuessCount} guesses (+${pts} pts)`, 'amber');
+  },
+
+  logGuess(player, word, meta, style = 'electric') {
+    const list = document.getElementById('guess-history-list');
+    const item = document.createElement('div');
+    item.className = 'log-item';
+    item.innerHTML = `
+      <span class="log-player"><strong>${player}</strong>: ${word}</span>
+      <span class="log-meta ${style}">${meta}</span>
+    `;
+    list.prepend(item);
+  },
+
+  // ── Bonus Solve Phase ──
+  startBonusSolvePhase() {
+    this.stopTimer();
+    this.bonusGuessersOrder = [...this.guessersOrder];
+    this.bonusGuesserIndex = 0;
+    this.bonusAttempted = [];
+    this.isValidatingBonus = false;
+    document.getElementById('bonus-history-list').innerHTML = '';
+    this.renderBoard('bonus-board-container');
+    this.updateBonusUI();
+    this.switchScreen('screen-bonus-solve');
+  },
+
+  updateBonusUI() {
+    const guesser = this.bonusGuessersOrder[this.bonusGuesserIndex];
+    document.getElementById('bonus-current-guesser').textContent = guesser;
+    document.getElementById('bonus-avatar').textContent = initials(guesser);
+    document.getElementById('input-bonus-guess').value = '';
+    document.getElementById('bonus-validation').textContent = '';
+    document.getElementById('bonus-validation').className = 'vstatus';
+    this.hideErr('bonus-error');
+    document.getElementById('btn-bonus-submit').disabled = false;
+    document.getElementById('btn-bonus-skip').disabled = false;
+  },
+
+  async submitBonusGuess() {
+    if (this.isValidatingBonus) return;
+    const input = document.getElementById('input-bonus-guess').value.trim().toUpperCase();
+    const validEl = document.getElementById('bonus-validation');
+    const guesser = this.bonusGuessersOrder[this.bonusGuesserIndex];
+
+    if (!input) { this.showErr('bonus-error', 'Enter a word first.'); return; }
+    this.hideErr('bonus-error');
+
+    this.isValidatingBonus = true;
+    document.getElementById('btn-bonus-submit').disabled = true;
+    document.getElementById('btn-bonus-skip').disabled = true;
+    validEl.innerHTML = '<span class="spinner"></span>Checking…';
+    validEl.className = 'vstatus checking';
+
+    const valid = await isValidEnglishWord(input);
+    this.isValidatingBonus = false;
+
+    if (!valid) {
+      validEl.textContent = '✗ Not a valid English word.';
+      validEl.className = 'vstatus invalid';
+      document.getElementById('btn-bonus-submit').disabled = false;
+      document.getElementById('btn-bonus-skip').disabled = false;
+      return;
+    }
+
+    validEl.textContent = '';
+    validEl.className = 'vstatus';
+    document.getElementById('btn-bonus-submit').disabled = false;
+    document.getElementById('btn-bonus-skip').disabled = false;
+
+    this.bonusAttempted.push(guesser);
+
+    if (input === this.secretWord) {
+      this.scores[guesser] += 20;
+      this.roundPointsGained[guesser] += 20;
+      this.metricPerfectGuesses[guesser]++;
+      this.logBonus(guesser, input, '🎉 Solved! (+20 pts)', 'neon');
+      this.terminateRound(`${guesser} solved it in the Bonus Phase!`);
+    } else {
+      this.logBonus(guesser, input, '❌ Wrong', 'muted');
+      this.advanceBonusTurn();
+    }
+  },
+
+  advanceBonusTurn() {
+    const guesser = this.bonusGuessersOrder[this.bonusGuesserIndex];
+    if (!this.bonusAttempted.includes(guesser)) {
+      this.logBonus(guesser, '[SKIPPED]', '⏩ Skipped', 'muted');
+      this.bonusAttempted.push(guesser);
+    }
+    this.bonusGuesserIndex++;
+    if (this.bonusGuesserIndex >= this.bonusGuessersOrder.length) {
+      this.terminateRound('Nobody solved the word in the Bonus Phase!');
+      return;
+    }
+    this.updateBonusUI();
+  },
+
+  logBonus(player, word, meta, style = 'electric') {
+    const list = document.getElementById('bonus-history-list');
+    const item = document.createElement('div');
+    item.className = 'log-item';
+    item.innerHTML = `
+      <span class="log-player"><strong>${player}</strong>: ${word}</span>
+      <span class="log-meta ${style}">${meta}</span>
+    `;
+    list.prepend(item);
+  },
+
+  // ── Round End ──
+  terminateRound(reason) {
+    this.stopTimer();
+
+    // Update highest-round-score metric
+    this.players.forEach(p => {
+      if (this.roundPointsGained[p] > this.metricHighestRoundScore[p]) {
+        this.metricHighestRoundScore[p] = this.roundPointsGained[p];
+      }
+    });
+
+    document.getElementById('result-reveal-word').textContent = this.secretWord;
+    document.getElementById('result-reason').textContent = reason;
+
+    const tbody = document.getElementById('round-stat-body');
+    tbody.innerHTML = '';
+    this.players.forEach(p => {
+      const isHolder = p === this.wordHolder;
+      const earned = this.roundPointsGained[p];
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${p}</td>
+        <td>${isHolder ? '<span class="pill pill-holder">Holder</span>' : '<span class="pill pill-guesser">Guesser</span>'}</td>
+        <td style="color:var(--neon);font-weight:600;">+${earned}</td>
+        <td style="color:var(--electric);font-weight:600;">${this.scores[p]}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    document.getElementById('btn-next-round').textContent =
+      this.currentRound >= this.totalRounds ? '🏆 Final Standings' : 'Next Round →';
+
+    this.switchScreen('screen-round-result');
+  },
+
+  initiateNextRound() {
+    if (this.currentRound >= this.totalRounds) {
+      this.compileFinalStandings();
+    } else {
+      this.startNewRoundStructure();
+    }
+  },
+
+  // ── Final Standings ──
+  compileFinalStandings() {
+    const sorted = [...this.players].sort((a, b) => this.scores[b] - this.scores[a]);
+    const winner = sorted[0];
+
+    document.getElementById('grand-winner-name').textContent = winner;
+    document.getElementById('grand-winner-score').textContent = `${this.scores[winner]} Points`;
+
+    const tbody = document.getElementById('final-leaderboard-body');
+    tbody.innerHTML = '';
+    sorted.forEach((p, i) => {
+      const rank = i + 1;
+      const tr = document.createElement('tr');
+      if (rank === 1) tr.className = 'winner-row';
+      tr.innerHTML = `
+        <td><span class="rank-num ${rank===1?'gold':''}">${rank}</span></td>
+        <td>${p}</td>
+        <td style="font-weight:600;color:${rank===1?'var(--neon)':'var(--electric)'};">${this.scores[p]} pts</td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    const best = (obj) => {
+      let top = '—', val = -1;
+      for (const [p, v] of Object.entries(obj)) { if (v > val) { val = v; top = p; } }
+      return { name: top, val };
+    };
+
+    const bl = best(this.metricLettersRevealed);
+    const bp = best(this.metricPerfectGuesses);
+    const br = best(this.metricHighestRoundScore);
+    const bh = best(this.metricHolderPoints);
+
+    document.getElementById('stat-most-letters').textContent = bl.val > 0 ? `${bl.name} (${bl.val})` : '—';
+    document.getElementById('stat-most-perfect').textContent = bp.val > 0 ? `${bp.name} (${bp.val})` : '—';
+    document.getElementById('stat-highest-round').textContent = br.val > 0 ? `${br.name} (${br.val} pts)` : '—';
+    document.getElementById('stat-best-holder').textContent = bh.val > 0 ? `${bh.name} (${bh.val} pts)` : '—';
+
+    this.switchScreen('screen-final-results');
+  },
+
+  restartWholeGame() {
+    // Full reset
+    this.players = [];
+    this.totalRounds = 5;
+    this.currentRound = 0;
+    this.difficulty = 'easy';
+    this.holderHistory = [];
+    this.roundStartPlayerIndex = 0;
+    this.scores = {};
+    this.metricLettersRevealed = {};
+    this.metricPerfectGuesses = {};
+    this.metricHighestRoundScore = {};
+    this.metricHolderPoints = {};
+    this.stopTimer();
+    this.isValidatingGuess = false;
+    this.isValidatingBonus = false;
+    this.isLockingWord = false;
+    this.setDifficulty('easy');
+    this.renderPlayerInputs();
+    this.switchScreen('screen-welcome');
+  }
 };
 
-window.onload = () => Game.init();
+window.addEventListener('load', () => Game.init());
 </script>
 </body>
 </html>
